@@ -10,22 +10,21 @@ function ejecutar() {
     // Creamos la constante reconocimiento y le asignamos la API webkitSpeechRecognition
     const reconocimiento = new webkitSpeechRecognition();
 
+    // Configuramos el reconocimiento para capturar solo un resultado continuo
+    reconocimiento.interimResults = false;
+
     // Comenzamos el reconocimiento
     reconocimiento.start();
 
     // Función que se ejecuta cuando se inicia el reconocimiento
     reconocimiento.onstart = function () {
-        // Asignamos la clase mostrar al elemento salida
         salida.classList.add('mostrar');
-        // Asignamos el texto a mostrar en el elemento salida
         salida.textContent = 'Escuchando...';
     };
 
     // Función que se ejecuta cuando se deja de grabar
     reconocimiento.onspeechend = function () {
-        // Asignamos el texto a mostrar en el elemento salida
         salida.textContent = 'Se dejó de grabar';
-        // Detenemos el reconocimiento
         reconocimiento.stop();
     };
 
@@ -33,19 +32,35 @@ function ejecutar() {
     reconocimiento.onresult = function (e) {
         console.log(e.results[0][0]);
 
-        // Destructuramos el objeto e.results[0][0] y obtenemos el transcript y el confidence
         const { transcript, confidence } = e.results[0][0];
 
-        // Creamos un elemento p y le asignamos el texto a mostrar
-        const texto = document.createElement('p');
-        texto.innerHTML = `Grabado: ${transcript}`;
+        // Usamos una expresión regular para filtrar números
+        const numeros = transcript.match(/\d+/g);
 
-        // Creamos otro elemento p y le asignamos el texto a mostrar
-        const fiabilidad = document.createElement('p');
-        fiabilidad.innerHTML = `Fiabilidad del ${parseInt(confidence * 100)}%`;
+        // Limpiamos la salida anterior
+        salida.innerHTML = '';
 
-        // Agregamos los elementos p al elemento salida
-        salida.appendChild(texto);
-        salida.appendChild(fiabilidad);
-    }
+        if (numeros) {
+            // Si se encontraron números, los mostramos
+            numeros.forEach(numero => {
+                const texto = document.createElement('p');
+                texto.innerHTML = `Número detectado: ${numero}`;
+                salida.appendChild(texto);
+            });
+
+            const fiabilidad = document.createElement('p');
+            fiabilidad.innerHTML = `Fiabilidad del ${parseInt(confidence * 100)}%`;
+            salida.appendChild(fiabilidad);
+        } else {
+            // Si no se encontraron números, mostramos un mensaje
+            const texto = document.createElement('p');
+            texto.innerHTML = `No se detectaron números.`;
+            salida.appendChild(texto);
+        }
+    };
+
+    // Manejo de errores
+    reconocimiento.onerror = function (event) {
+        salida.textContent = `Error en el reconocimiento: ${event.error}`;
+    };
 }
