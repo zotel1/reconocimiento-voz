@@ -9,7 +9,7 @@ microfono.addEventListener('click', ejecutar);
 
 function ejecutar() {
     // creamos la constante reconocimientoVoz y le asignamos la API webkitSpeechRecognition
-    const reconocimientoVoz = webkitSpeechRecognition;
+    const reconocimientoVoz = new webkitSpeechRecognition();
 
     // creamos la constante reconocimiento y le asignamos la constante reconocimientoVoz
     const reconocimiento = reconocimientoVoz();
@@ -38,7 +38,7 @@ function ejecutar() {
         console.log(e.results[0][0]);
 
         // Destructuramos el objeto e.results[0][0] y obtenemos el transcript y el confidence
-        const{ transcript, confidence } = e.resuls[0][0];
+        const{ transcript, confidence } = e.results[0][0];
 
         // Creamos un elemento p y le asignamos el texto a mostrar
         const texto = document.createElement('p');
@@ -56,6 +56,4 @@ function ejecutar() {
         salida.appendChild(texto);
         salida.appendChild(fiabilidad);
     }
-
-
 }
